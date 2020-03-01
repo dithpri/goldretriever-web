@@ -1,14 +1,15 @@
 # goldretriever-web #
 
 goldretriever-web is a free and open source web application that allows you to
-automatically log into and semi-automatically restore NationStates nations.
-This is useful to maintain a large number of puppet nations by preventing them
-from ceasing to exist or easily restoring them if they have ceased to exist.
+check NationsStates nations' trading cards' total bank, deck value, and more
 
 goldretriever-web features the following:
 
-* ability to login and restore nations, and to automatically determine which
-  is necessary
+* ability to check any nation's total bank and deck value
+* ability to check puppet nations' number of unanswered issues and unopened
+  packs
+* output in a table for pleasurable viewing and easy copy-pasting into a
+  spreadsheet
 * progress reporting
 * rate-limiting
 * ability to save configuration
