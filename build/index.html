@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>nslogin-web</title>
+    <title>goldretriever-web</title>
 
     <!-- Bootstrap CSS -->
     <link href="third-party/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -14,8 +14,8 @@
     <script src="third-party/respond/respond.min.js"></script>
     <![endif]-->
 
-    <!-- nslogin-web CSS -->
-    <link href="css/nsloginweb.css" rel="stylesheet">
+    <!-- goldretriever-web CSS -->
+    <link href="css/goldretrieverweb.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
@@ -28,7 +28,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <span class="navbar-brand">nslogin-web</span>
+                <span class="navbar-brand">goldretriever-web</span>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -49,7 +49,7 @@
 
     <div class="tab-content">
         <div class="tab-pane active" id="configuration">
-            <p class="lead">nslogin-web is a free and open source web
+            <p class="lead">goldretriever-web is a free and open source web
                 application that allows you to automatically log into and
                 semi-automatically restore NationStates nations.</p>
             <div class="panel panel-default">
@@ -102,27 +102,20 @@
                                        id="modeAuto"
                                        checked="checked">
                                 Auto
-                                <span class="text-muted">(automatically log
-                                    into or restore each nation, depending on
-                                    whether or not it currently exists)</span>
+                                <span class="text-muted">(automatically fetch
+                                    Bank, Deck Value and, if a password is
+                                    provided, number of issues and unopened
+                                    packs)</span>
                             </label>
                         </div>
                         <div class="radio">
                             <label>
                                 <input type="radio" name="mode"
-                                       id="modeLogin">
-                                Login
-                                <span class="text-muted">(try to log into each
-                                    nation)</span>
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <input type="radio" name="mode"
-                                       id="modeRestore">
-                                Restore
-                                <span class="text-muted">(try to restore each
-                                    nation)</span>
+                                       id="modeBank_DV"
+                                       checked="checked">
+                                Only Bank and DV
+                                <span class="text-muted">(only fetch Bank and
+                                    Deck Value)</span>
                             </label>
                         </div>
                     </div>
@@ -133,10 +126,14 @@
                         </label>
                         <span class="help-block">Nation names and passwords
                             must be entered in the form "nation,password",
-                            with one pair on each line. For example:</span>
+                            with one pair on each line.<b> If a password is not
+                                provided, issues and unopened packs will not be
+                                fetched.
+                            </b> For example:</span>
                         <pre>Bigtopia,trees98
 Tinyland,asparagus1*
-Mediumville,$nowF@LL</pre>
+Mediumville,$nowF@LL
+Testlandia</pre>
                         <textarea id="credentials"
                                   class="form-control"
                                   rows="10"></textarea>
@@ -178,6 +175,9 @@ Mediumville,$nowF@LL</pre>
                         </label>
                     </div>
                     <pre class="log" id="log"></pre>
+                    <table class="table" id="table_log">
+                        <tr><th>Nation</th><th>Bank</th><th>DV</th><th>Issues</th><th>Packs</th></tr>
+                    </table>
                     <button id="pauseButton"
                             class="btn btn-default"
                             disabled>
@@ -207,13 +207,17 @@ Mediumville,$nowF@LL</pre>
                     <h3 class="panel-title">About</h3>
                 </div>
                 <div class="panel-body">
-                    <b>nslogin-web</b><br>
-                    Copyright (C) 2017 Auralia<br>
+                    <b>goldretriever-web</b><br>
+                    <b>nslogin-web</b> Copyright (C) 2017 Auralia<br>
+                    Modifications copyright (C) 2020 dithpri (Racoda)<br>
+                    <br>
+                    A huge thanks to <i>Valentine-Z</i> for the original
+                    python version and <i>SherpDaWerp</i> for example code!
                     <br>
                     <em>GitHub repository:</em> <a
-                        href="https://github.com/auralia/nslogin-web">https://github.com/auralia/nslogin-web</a><br>
+                        href="https://github.com/dithpri/goldretriever-web">https://github.com/dithpri/goldretriever-web</a><br>
                     <em>NationStates forum page:</em> <a
-                        href="https://forum.nationstates.net/viewtopic.php?f=15&t=401352">https://forum.nationstates.net/viewtopic.php?f=15&t=401352</a>
+                        href="#">(unavailable)</a>
                 </div>
             </div>
             <div class="panel panel-default">
@@ -221,7 +225,7 @@ Mediumville,$nowF@LL</pre>
                     <h3 class="panel-title">License</h3>
                 </div>
                 <div class="panel-body">
-                    <p>nslogin-web is licensed under the Apache
+                    <p>goldretriever-web is licensed under the Apache
                         License 2.0:</p>
 
                     <h2><a id="Apache_License_0"></a>Apache License</h2>
@@ -552,7 +556,7 @@ limitations under the License.</pre>
 <iframe id="iframe" style="position: absolute; left: -5000px;"
         src="iframe.html"></iframe>
 
-<!-- nslogin-web JavaScript -->
+<!-- goldretriever-web JavaScript -->
 <script src="js/bundle.js"></script>
 
 </body>

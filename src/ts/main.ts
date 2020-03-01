@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2017 Auralia
+ * Modifications copyright (C) 2020 dithpri (Racoda)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +15,7 @@
  * limitations under the License.
  */
 
-import NsLoginWebUi from "./ui";
+import goldretrieverWebUi from "./ui";
 // @formatter:off
 import * as $ from "jquery";
 // Hack to ensure bootstrap has access to jQuery
@@ -23,4 +24,4 @@ import * as $ from "jquery";
 import "bootstrap";
 // @formatter:on
 
-new NsLoginWebUi().init();
+new goldretrieverWebUi().init();

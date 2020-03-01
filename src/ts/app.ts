@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2017 Auralia
+ * Modifications copyright (C) 2020 dithpri (Racoda)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +19,10 @@ import Ui from "./ui";
 import * as util from "util";
 
 /**
- * Represents the operating mode of nslogin-web.
+ * Represents the operating mode of goldretriever-web.
  */
 export enum Mode {
-    Login,
-    Restore,
+    Bank_DV,
     Auto
 }
 
@@ -34,12 +34,21 @@ export interface Credential {
     password: string
 }
 
+export interface LogTableRow {
+    nation: string,
+    bank: string,
+    dv: string,
+    issues: string,
+    packs: string
+}
+
 /**
  * Contains the main application logic.
  */
 export default class App {
     private _cancel: boolean;
     private _pause: boolean;
+    // @ts-ignore
     private _userAgent: string;
 
     /**
@@ -56,13 +65,13 @@ export default class App {
      * @param name The name to convert.
      *
      * @return The converted name.
-     */
+     *
     private static toId(name: string) {
         return name.replace("_", " ")
                    .trim()
                    .toLowerCase()
                    .replace(" ", "_");
-    }
+    }*/
 
     /**
      * Sleeps for the specified number of milliseconds.
@@ -93,7 +102,7 @@ export default class App {
     {
         this.reset();
 
-        this._userAgent = `nslogin-web (maintained by Auralia, currently`
+        this._userAgent = `goldretriever-web-dev (maintained by dithpri/Racoda, currently`
                           + ` used by "${userAgent}")`;
 
         const api = new NsApi(userAgent, true, rateLimit);
@@ -102,12 +111,9 @@ export default class App {
             if (mode === Mode.Auto) {
                 Ui.log("info", "Auto mode");
                 await this.auto(api, credentials, verbose);
-            } else if (mode === Mode.Login) {
-                Ui.log("info", "Login mode");
-                await this.loginNations(api, credentials, verbose);
-            } else if (mode === Mode.Restore) {
-                Ui.log("info", "Restore mode");
-                await this.restoreNations(api, credentials, verbose);
+            } else if (mode === Mode.Bank_DV) {
+                Ui.log("info", "Bank/DV");
+                await this.getNationsBankDV(api, credentials, verbose);
             } else {
                 throw new Error("Unrecognized mode");
             }
@@ -168,12 +174,10 @@ export default class App {
     }
 
     /**
-     * Logs into or restores the nations given by the specified credentials
-     * depending on whether they currently exist.
+     * TODO
      *
      * @param api The NsApi instance to use.
-     * @param credentials The names and passwords of the nations to log into or
-     *                    restore.
+     * @param credentials The names and passwords of the nations
      * @param verbose Whether or not to print out detailed error messages.
      */
     private async auto(api: NsApi, credentials: Credential[],
@@ -183,145 +187,100 @@ export default class App {
                 break;
             }
             await this.waitUntilUnpaused();
-            let login = true;
+            let nation_exists = true;
             try {
-                Ui.log("info", `${credential.nation}: Nation exists`);
                 await api.nationRequest(credential.nation, ["name"]);
+                Ui.log("info", `${credential.nation}: Nation exists`);
             } catch (_) {
                 Ui.log("info",
                        `${credential.nation}: Nation does not exist`);
-                login = false;
+                nation_exists = false;
             }
-            if (login) {
-                await this.loginNations(api, [credential], verbose);
+            if (nation_exists) {
+                let result: LogTableRow = <LogTableRow>await this.getSingleNationBankDV(api, credential, verbose);
+                let result2: LogTableRow | null = await this.getSingleNationIssuesPacks(api, credential, verbose);
+                if (result2 !== null && result2 !== undefined) {
+                    result.issues = result2.issues;
+                    result.packs = result2.packs;
+                }
+                Ui.log_tabledata(result);
+            }
+        }
+    }
+
+    private async getNationsBankDV(api: NsApi,
+                                  credentials: Credential[],
+                                  verbose: boolean): Promise<void> {
+        for (const credential of credentials) {
+            await this.getSingleNationBankDV(api, credential, verbose);
+        }
+    }
+
+    private async getSingleNationIssuesPacks(api: NsApi,
+                                        credential: Credential,
+                                        verbose: boolean): Promise<LogTableRow|null> {
+        if (this._cancel) {
+            return null;
+        }
+        await this.waitUntilUnpaused();
+        try {
+            Ui.log("info", `${credential.nation}: Retrieving Issues and Packs`);
+            const response = await api.nationRequest(credential.nation,
+                ["packs", "issues"],
+                undefined,
+                {password: credential.password},
+                true);
+            const packs: string = response.packs;
+            let issues: string = "0";
+            if (Array.isArray(response.issues.issue)) {
+                issues = response.issues.issue.length;
+            } else if (response.issues.issue) {
+                issues = "1";
             } else {
-                await this.restoreNations(api, [credential], verbose);
+                issues = "0";
+            }
+            return {
+                nation: credential.nation,
+                bank: "N/A",
+                dv: "N/A",
+                issues: issues,
+                packs: packs
+            };
+        } catch(err) {
+            Ui.log("error", "Issue/Pack retrieval failed");
+            if (verbose) {
+                Ui.log("error", util.inspect(err))
             }
         }
+        return null;
     }
 
-    /**
-     * Logs into the nations given by the specified credentials.
-     *
-     * @param api The NsApi instance to use.
-     * @param credentials The names and passwords of the nations to log into or
-     *                    restore.
-     * @param verbose Whether or not to print out detailed error messages.
-     */
-    private async loginNations(api: NsApi,
-                               credentials: Credential[],
-                               verbose: boolean): Promise<void> {
-        for (const credential of credentials) {
-            if (this._cancel) {
-                break;
-            }
-            await this.waitUntilUnpaused();
-            try {
-                Ui.log("info", `${credential.nation}: Logging in...`);
-                await api.nationRequest(credential.nation,
-                                        ["ping"],
-                                        {},
-                                        {password: credential.password},
-                                        true);
-                const data = await api.nationRequest(credential.nation,
-                                                     ["lastlogin"]);
-                const now = Date.now() / 1000;
-                const lastLogin = parseInt(data["lastlogin"], 10);
-                if (now - lastLogin > 30) {
-                    Ui.log("error", `${credential.nation}: Login failed`);
-                    if (verbose) {
-                        Ui.log("error", "More than 30 seconds between now"
-                                        + " and last login");
-                    }
-                } else {
-                    Ui.log("info", `${credential.nation}: Login successful`
-                                   + ` (or nation was logged into in the`
-                                   + ` last 30 seconds)`);
-                }
-            } catch (err) {
-                Ui.log("error", `${credential.nation}: Login failed`);
-                if (verbose) {
-                    Ui.log("error", util.inspect(err));
-                }
+
+    private async getSingleNationBankDV(api: NsApi,
+                                  credential: Credential,
+                                  verbose: boolean): Promise<LogTableRow|null> {
+        if (this._cancel) {
+            return null;
+        }
+        await this.waitUntilUnpaused();
+        try {
+            Ui.log("info", `${credential.nation}: Retrieving Bank and DV`);
+            // A hack, cards api is not available in node-nsapi
+            const response = await api.worldRequest(["cards", "info"], {"nationname":credential.nation});
+            return {
+                nation: credential.nation,
+                bank: response.info.bank,
+                dv: response.info.deck_value,
+                issues: "N/A",
+                packs: "N/A"
+            };
+        } catch(err) {
+            Ui.log("error", "Bank/DV retrieval failed");
+            if (verbose) {
+                Ui.log("error", util.inspect(err))
             }
         }
-    }
-
-    /**
-     * Restores the nations given by the specified credentials.
-     *
-     * @param api The NsApi instance to use.
-     * @param credentials The names and passwords of the nations to log into or
-     *                    restore.
-     * @param verbose Whether or not to print out detailed error messages.
-     */
-    private async restoreNations(api: NsApi,
-                                 credentials: Credential[],
-                                 verbose: boolean): Promise<void> {
-        for (const credential of credentials) {
-            if (this._cancel) {
-                break;
-            }
-            await this.waitUntilUnpaused();
-            Ui.log("info", `${credential.nation}: Waiting for confirmation...`);
-            await Ui.confirm();
-            Ui.log("info", `${credential.nation}: Confirmation received,`
-                           + ` restoring...`);
-            try {
-                await this.restoreRequest(credential);
-                await api.nationRequest(credential.nation,
-                                        ["name"]);
-                Ui.log("info", `${credential.nation}: Restore successful (or`
-                               + ` nation already existed)`);
-            } catch (err) {
-                Ui.log("error",
-                       `${credential.nation}: Restore failed`);
-                if (verbose) {
-                    Ui.log("error", util.inspect(err));
-                }
-            }
-        }
-    }
-
-    /**
-     * Restores the specified nation using a hidden form. Waits 6 seconds
-     * after doing so in order to confirm to NationStates rate limits.
-     *
-     * @param credential The name and password of the nation to restore.
-     */
-    private restoreRequest(credential: Credential): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            let resolved = false;
-
-            const iframe = $("#iframe");
-            iframe.off("load");
-            iframe.on("load", () => {
-                iframe.off("load");
-                iframe.contents().find("#restoreUserAgent").val(
-                    this._userAgent);
-                iframe.contents().find("#restoreLoggingIn").val(
-                    "1");
-                iframe.contents().find("#restoreNation").val(
-                    App.toId(credential.nation));
-                iframe.contents().find("#restoreRestoreNation").val(
-                    " Restore " + App.toId(credential.nation) + " ");
-                iframe.contents().find("#restoreRestorePassword").val(
-                    credential.password);
-                iframe.contents().find("#restoreSubmit").click();
-
-                setTimeout(() => {
-                    resolved = true;
-                    resolve();
-                }, 6000);
-            });
-            iframe.attr({src: "iframe.html"});
-
-            setTimeout(() => {
-                if (!resolved) {
-                    reject();
-                }
-            }, 15000);
-        });
+        return null;
     }
 
     /**

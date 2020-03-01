@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2013-2015 Auralia
+ * Modifications copyright (C) 2020 dithpri (Racoda)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +20,8 @@ body {
 }
 
 .log {
-    height: 500px;
-    max-height: 500px;
+    height: 250px;
+    max-height: 250px;
     overflow: auto;
 }
 

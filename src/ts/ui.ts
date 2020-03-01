@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2017 Auralia
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import App, {Credential, Mode} from "./app";
+import App, {Credential, Mode, LogTableRow} from "./app";
 import * as $ from "jquery";
 
 /**
@@ -82,14 +82,31 @@ export default class Ui {
      * @param message The log message.
      */
     public static log(type: string, message: string) {
-        const logElement = $("#log");
-        const text = logElement.html();
+            const logElement = $("#log");
+            const text = logElement.html();
 
-        message = type + ": " + message;
-        if (text !== "") {
-            message = "<br>" + message;
-        }
-        logElement.html(text + message);
+            message = type + ": " + message;
+            if (text !== "") {
+                message = "<br>" + message;
+            }
+            logElement.html(text + message);
+
+            if ($("#scrollToBottom").is(":checked")) {
+                logElement.scrollTop(
+                    Number(logElement.prop("scrollHeight")));
+            }
+    }
+
+    public static log_tabledata(data: LogTableRow) {
+        const logElement = $("#table_log > tbody");
+        logElement.append(
+            $("<tr></tr>")
+            .append($("<td></td>").text(data.nation))
+            .append($("<td></td>").text(data.bank))
+            .append($("<td></td>").text(data.dv))
+            .append($("<td></td>").text(data.issues))
+            .append($("<td></td>").text(data.packs))
+            );
 
         if ($("#scrollToBottom").is(":checked")) {
             logElement.scrollTop(
@@ -191,12 +208,9 @@ export default class Ui {
             const mode = localStorage.getItem("mode");
             switch (mode) {
                 case "0":
-                    $("#modeLogin").prop("checked", true);
+                    $("#modeBank_Dv").prop("checked", true);
                     break;
                 case "1":
-                    $("#modeRestore").prop("checked", true);
-                    break;
-                case "2":
                     $("#modeAuto").prop("checked", true);
                     break;
             }
@@ -333,13 +347,10 @@ export default class Ui {
      * Gets the selected mode.
      */
     private static getMode(): Mode {
-        const loginModeInput = $("#modeLogin");
-        const restoreModeInput = $("#modeRestore");
+        const bank_DVModeInput = $("#modeBank_DV");
         const autoModeInput = $("#modeAuto");
-        if (loginModeInput.is(":checked")) {
-            return Mode.Login;
-        } else if (restoreModeInput.is(":checked")) {
-            return Mode.Restore;
+        if (bank_DVModeInput.is(":checked")) {
+            return Mode.Bank_DV;
         } else if (autoModeInput.is(":checked")) {
             return Mode.Auto;
         } else {

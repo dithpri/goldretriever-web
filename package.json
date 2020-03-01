@@ -1,14 +1,14 @@
 {
-  "name": "nslogin-web",
-  "description": "Web client for logging into and restoring NationStates nations",
+  "name": "goldretriever-web",
+  "description": "Web client for retrieving Bank, Deck Value, Issues and Unopened packs of NationStates nations",
   "license": "Apache-2.0",
   "author": {
-    "name": "Auralia",
-    "email": "railana-ns@outlook.com"
+    "name": "dithpr",
+    "email": "dithpri@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/auralia/nslogin-web.git"
+    "url": "git://github.com/dithpri/goldretriever-web.git"
   },
   "devDependencies": {
     "browserify": "^14.5.0",
