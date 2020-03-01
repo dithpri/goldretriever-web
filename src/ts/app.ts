@@ -187,31 +187,28 @@ export default class App {
                 break;
             }
             await this.waitUntilUnpaused();
-            let nation_exists = true;
             try {
-                await api.nationRequest(credential.nation, ["name"]);
-                Ui.log("info", `${credential.nation}: Nation exists`);
-            } catch (_) {
-                Ui.log("info",
-                       `${credential.nation}: Nation does not exist`);
-                nation_exists = false;
+                // function scope
+                var result: LogTableRow = <LogTableRow> await this.getSingleNationBankDV(api, credential);
+            } catch(err) {
+                Ui.log("error", "Bank/DV retrieval failed");
+                continue;
             }
-            if (nation_exists) {
-                let result: LogTableRow = <LogTableRow>await this.getSingleNationBankDV(api, credential, verbose);
-                if (credential.password !== null) {
-                    console.log(credential);
-                    try {
-                        let result2: LogTableRow | null = await this.getSingleNationIssuesPacks(api, credential, verbose);
-                        if (result2 !== null && result2 !== undefined) {
-                            result.issues = result2.issues;
-                            result.packs = result2.packs;
-                        }
-                    } catch(err) {
-                        Ui.log("error", "Issue/Pack retrieval failed.")
+            if (credential.password !== null) {
+                try {
+                    let result2: LogTableRow | null = await this.getSingleNationIssuesPacks(api, credential);
+                    if (result2 !== null && result2 !== undefined) {
+                        result.issues = result2.issues;
+                        result.packs = result2.packs;
+                    }
+                } catch(err) {
+                    Ui.log("error", "Issue/Pack retrieval failed.")
+                    if (verbose) {
+                        Ui.log("error", util.inspect(err))
                     }
                 }
-                Ui.log_tabledata(result);
             }
+            Ui.log_tabledata(result);
         }
     }
 
@@ -223,92 +220,63 @@ export default class App {
                 break;
             }
             await this.waitUntilUnpaused();
-            let nation_exists = true;
             try {
-                await api.nationRequest(credential.nation, ["name"]);
-                Ui.log("info", `${credential.nation}: Nation exists`);
-            } catch (_) {
-                Ui.log("info",
-                       `${credential.nation}: Nation does not exist`);
-                nation_exists = false;
-            }
-            if (nation_exists) {
-                const row = await this.getSingleNationBankDV(api, credential, verbose);
-                if (row !== null) {
-                    Ui.log_tabledata(row);
+                const row: LogTableRow = await this.getSingleNationBankDV(api, credential);
+                Ui.log_tabledata(row);
+            } catch(err) {
+                Ui.log("error", "Bank/DV retrieval failed");
+                if (verbose) {
+                    Ui.log("error", util.inspect(err))
                 }
             }
         }
     }
 
     private async getSingleNationIssuesPacks(api: NsApi,
-                                        credential: Credential,
-                                        verbose: boolean): Promise<LogTableRow|null> {
-        if (this._cancel) {
-            return null;
-        }
-        await this.waitUntilUnpaused();
+                                        credential: Credential): Promise<LogTableRow> {
         if (credential.password === null) {
             throw new Error("Tried to retrieve Issues/Packs without a password.");
         }
-        try {
-            Ui.log("info", `${credential.nation}: Retrieving Issues and Packs`);
-            const response = await api.nationRequest(credential.nation,
-                ["packs", "issues"],
-                undefined,
-                {password: <string>credential.password},
-                true);
-            const packs: string = response.packs;
-            let issues: string = "0";
-            if (Array.isArray(response.issues.issue)) {
-                issues = response.issues.issue.length;
-            } else if (response.issues.issue) {
-                issues = "1";
-            } else {
-                issues = "0";
-            }
-            return {
-                nation: credential.nation,
-                bank: "N/A",
-                dv: "N/A",
-                issues: issues,
-                packs: packs
-            };
-        } catch(err) {
-            Ui.log("error", "Issue/Pack retrieval failed");
-            if (verbose) {
-                Ui.log("error", util.inspect(err))
-            }
+        Ui.log("info", `${credential.nation}: Retrieving Issues and Packs`);
+        const response = await api.nationRequest(credential.nation,
+            ["packs", "issues"],
+            undefined,
+            {password: <string>credential.password},
+            true);
+        const packs: string = response.packs;
+        let issues: string = "0";
+        if (Array.isArray(response.issues.issue)) {
+            issues = response.issues.issue.length;
+        } else if (response.issues.issue) {
+            issues = "1";
+        } else {
+            issues = "0";
         }
-        return null;
+        return {
+            nation: credential.nation,
+            bank: "N/A",
+            dv: "N/A",
+            issues: issues,
+            packs: packs
+        };
     }
 
 
     private async getSingleNationBankDV(api: NsApi,
-                                  credential: Credential,
-                                  verbose: boolean): Promise<LogTableRow|null> {
-        if (this._cancel) {
-            return null;
+                                  credential: Credential): Promise<LogTableRow> {
+        Ui.log("info", `${credential.nation}: Retrieving Bank and DV`);
+        // A hack, cards api is not available in node-nsapi
+        const response = await api.worldRequest(["cards", "info"], {"nationname":credential.nation});
+        if (response.info === "") {
+            throw new Error("Received empty response. Does the nation exist?");
         }
-        await this.waitUntilUnpaused();
-        try {
-            Ui.log("info", `${credential.nation}: Retrieving Bank and DV`);
-            // A hack, cards api is not available in node-nsapi
-            const response = await api.worldRequest(["cards", "info"], {"nationname":credential.nation});
-            return {
-                nation: credential.nation,
-                bank: response.info.bank,
-                dv: response.info.deck_value,
-                issues: "N/A",
-                packs: "N/A"
-            };
-        } catch(err) {
-            Ui.log("error", "Bank/DV retrieval failed");
-            if (verbose) {
-                Ui.log("error", util.inspect(err))
-            }
-        }
-        return null;
+        return {
+            nation: credential.nation,
+            bank: response.info.bank,
+            dv: response.info.deck_value,
+            issues: "N/A",
+            packs: "N/A"
+        };
     }
 
     /**
