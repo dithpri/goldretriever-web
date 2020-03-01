@@ -50,8 +50,8 @@
     <div class="tab-content">
         <div class="tab-pane active" id="configuration">
             <p class="lead">goldretriever-web is a free and open source web
-                application that allows you to automatically log into and
-                semi-automatically restore NationStates nations.</p>
+                application that allows you to check NationsStates nations'
+                trading cards' total bank, deck value, and more</p>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Configuration</h3>
@@ -161,12 +161,6 @@ Testlandia</pre>
                     <h3 class="panel-title">Log</h3>
                 </div>
                 <div class="panel-body">
-                    <p>Please note that you will be required to confirm the
-                        restoration of each nation that needs to be restored
-                        by clicking the "Confirm Restore" button below. This is
-                        required to satisfy the 'one click per action'
-                        NationStates script rule for actions that affect
-                        parts of NationStates other than your own nation.</p>
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="scrollToBottom"
@@ -190,11 +184,6 @@ Testlandia</pre>
                     </button>
                     <button id="clearButton" class="btn btn-default">
                         Clear Log
-                    </button>
-                    <button id="confirmButton"
-                            class="btn btn-default pull-right"
-                            disabled>
-                        Confirm Restore
                     </button>
                 </div>
 
@@ -552,9 +541,6 @@ limitations under the License.</pre>
         </div>
     </div>
 </div>
-
-<iframe id="iframe" style="position: absolute; left: -5000px;"
-        src="iframe.html"></iframe>
 
 <!-- goldretriever-web JavaScript -->
 <script src="js/bundle.js"></script>
