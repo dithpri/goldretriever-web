@@ -25,28 +25,26 @@ var sourcemaps = require("gulp-sourcemaps");
 var tsify = require("tsify");
 var uglify = require("gulp-uglify");
 
-gulp.task("default", ["prod"]);
-
 gulp.task("clean", function() {
     return del("build");
 });
 
-gulp.task("copy-html", ["clean"], function() {
+gulp.task("copy-html", function() {
     return gulp.src(["src/*.html"])
         .pipe(gulp.dest("build"))
 });
 
-gulp.task("copy-css", ["clean"], function() {
+gulp.task("copy-css", function() {
     return gulp.src(["src/css/**"])
                .pipe(gulp.dest("build/css"))
 });
 
-gulp.task("copy-third-party", ["clean"], function() {
+gulp.task("copy-third-party", function() {
     return gulp.src(["src/third-party/**"])
                .pipe(gulp.dest("build/third-party"))
 });
 
-gulp.task("prod", ["clean", "copy-html", "copy-css",
+gulp.task("prod", gulp.series("clean", gulp.parallel(["copy-html", "copy-css",
                    "copy-third-party"], function() {
     return browserify({
                           debug: false,
@@ -65,9 +63,9 @@ gulp.task("prod", ["clean", "copy-html", "copy-css",
         .pipe(buffer())
         .pipe(uglify())
         .pipe(gulp.dest("build/js"));
-});
+})));
 
-gulp.task("dev", ["clean", "copy-html", "copy-css",
+gulp.task("dev", gulp.series("clean", gulp.parallel(["copy-html", "copy-css",
                   "copy-third-party"], function() {
     return browserify({
                           debug: true,
@@ -88,4 +86,6 @@ gulp.task("dev", ["clean", "copy-html", "copy-css",
         .pipe(uglify())
         .pipe(sourcemaps.write({includeContent: false, sourceRoot: "../../"}))
         .pipe(gulp.dest("build/js"));
-});
+})));
+
+gulp.task("default", gulp.series(["prod"]));
