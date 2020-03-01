@@ -102,7 +102,7 @@ export default class App {
     {
         this.reset();
 
-        this._userAgent = `goldretriever-web-dev (maintained by dithpri/Racoda, currently`
+        this._userAgent = `goldretriever-web (maintained by dithpri/Racoda, currently`
                           + ` used by "${userAgent}")`;
 
         const api = new NsApi(userAgent, true, rateLimit);
