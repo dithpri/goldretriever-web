@@ -124,16 +124,19 @@
                                for="credentials">
                             Nation names and passwords
                         </label>
-                        <span class="help-block">Nation names and passwords
-                            must be entered in the form "nation,password",
-                            with one pair on each line.<b> If a password is not
-                                provided, issues and unopened packs will not be
-                                fetched.
-                            </b> For example:</span>
-                        <pre>Bigtopia,trees98
-Tinyland,asparagus1*
-Mediumville,$nowF@LL
-Testlandia</pre>
+                        <span class="help-block">
+                            Each line must be of the form "nation" or
+                            "nation,password". For example:</span>
+                            <pre>Testlandia
+Koem Kab
+MyAwesomePuppet,MySeekritPassword
+</pre>
+                            A password is only required to fetch the number of
+                            unopened packs and unanswered issues. If a password
+                            is not provided, they will not be fetched.
+                            <b>For more info about how passwords are used, check
+                                the <i>About</i> tab.
+                            </b>
                         <textarea id="credentials"
                                   class="form-control"
                                   rows="10"></textarea>
@@ -206,7 +209,40 @@ Testlandia</pre>
                     <em>GitHub repository:</em> <a
                         href="https://github.com/dithpri/goldretriever-web">https://github.com/dithpri/goldretriever-web</a><br>
                     <em>NationStates forum page:</em> <a
-                        href="#">(unavailable)</a>
+                        href="#">(unavailable)</a><br>
+                    Original python version by <i>Valentine-Z</i>: <a
+                        href="https://forum.nationstates.net/viewtopic.php?f=42&t=476326">https://forum.nationstates.net/viewtopic.php?f=42&t=476326</a><br>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">About passwords</h3>
+                </div>
+                <div class="panel-body">
+                    As in <b>nslogin-web</b>, upon which this project is based,
+                    all code is run client-side and passwords are only
+                    transferred to NationStates (and optionally saved in your
+                    browser's local storage).
+                    <br>
+                    Nothing is transferred to me (or Auralia) as a third party.
+                    <br>
+                    You can verify this yourself by reading the source code
+                    of <a
+                    href="https://github.com/dithpri/goldretriever-web">goldretriever-web</a>
+                    and of <a
+                        href="https://github.com/auralia/node-nsapi">Auralia's node-nsapi library</a>.
+                    <br>
+                    Please note that passwords are not required for the same
+                    functionality as provided by Valentine-Z's original script.
+                    <br>
+                    Passwords are only needed if you want to retrieve the number
+                    of unanswered issues and/or the number of unopened packs, as
+                    these are accessible only to logged-in nations.
+                    <br>
+                    If you do not trust the code, I highly recommend you do not
+                    use the issue/pack functionality (reasonable security
+                    practice) — in that case, don't even
+                    input the passwords!
                 </div>
             </div>
             <div class="panel panel-default">
