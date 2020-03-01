@@ -31,7 +31,7 @@ export enum Mode {
  */
 export interface Credential {
     nation: string,
-    password: string
+    password: string|null
 }
 
 export interface LogTableRow {
@@ -198,10 +198,17 @@ export default class App {
             }
             if (nation_exists) {
                 let result: LogTableRow = <LogTableRow>await this.getSingleNationBankDV(api, credential, verbose);
-                let result2: LogTableRow | null = await this.getSingleNationIssuesPacks(api, credential, verbose);
-                if (result2 !== null && result2 !== undefined) {
-                    result.issues = result2.issues;
-                    result.packs = result2.packs;
+                if (credential.password !== null) {
+                    console.log(credential);
+                    try {
+                        let result2: LogTableRow | null = await this.getSingleNationIssuesPacks(api, credential, verbose);
+                        if (result2 !== null && result2 !== undefined) {
+                            result.issues = result2.issues;
+                            result.packs = result2.packs;
+                        }
+                    } catch(err) {
+                        Ui.log("error", "Issue/Pack retrieval failed.")
+                    }
                 }
                 Ui.log_tabledata(result);
             }
@@ -212,7 +219,13 @@ export default class App {
                                   credentials: Credential[],
                                   verbose: boolean): Promise<void> {
         for (const credential of credentials) {
-            await this.getSingleNationBankDV(api, credential, verbose);
+            if (this._cancel) {
+                break;
+            }
+            const row = await this.getSingleNationBankDV(api, credential, verbose);
+            if (row !== null) {
+                Ui.log_tabledata(row);
+            }
         }
     }
 
@@ -223,12 +236,15 @@ export default class App {
             return null;
         }
         await this.waitUntilUnpaused();
+        if (credential.password === null) {
+            throw new Error("Tried to retrieve Issues/Packs without a password.");
+        }
         try {
             Ui.log("info", `${credential.nation}: Retrieving Issues and Packs`);
             const response = await api.nationRequest(credential.nation,
                 ["packs", "issues"],
                 undefined,
-                {password: credential.password},
+                {password: <string>credential.password},
                 true);
             const packs: string = response.packs;
             let issues: string = "0";

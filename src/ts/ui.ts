@@ -371,14 +371,18 @@ export default class Ui {
                 continue;
             }
             const tuple = lines[i].split(",");
-            if (tuple.length !== 2) {
+            if (tuple.length !== 2 && tuple.length !== 1) {
                 throw new Error(
                     `Nation names and passwords text box does not`
                     + ` contain a single nation name and a single`
                     + ` password in the form 'nation,password' on`
                     + ` line ${i + 1}`);
             }
-            credentials.push({nation: tuple[0], password: tuple[1]});
+            if (tuple.length === 1) {
+                credentials.push({nation: tuple[0], password: null});
+            } else {
+                credentials.push({nation: tuple[0], password: tuple[1]});
+            }
         }
         if (credentials.length === 0) {
             throw new Error(
