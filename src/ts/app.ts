@@ -222,9 +222,21 @@ export default class App {
             if (this._cancel) {
                 break;
             }
-            const row = await this.getSingleNationBankDV(api, credential, verbose);
-            if (row !== null) {
-                Ui.log_tabledata(row);
+            await this.waitUntilUnpaused();
+            let nation_exists = true;
+            try {
+                await api.nationRequest(credential.nation, ["name"]);
+                Ui.log("info", `${credential.nation}: Nation exists`);
+            } catch (_) {
+                Ui.log("info",
+                       `${credential.nation}: Nation does not exist`);
+                nation_exists = false;
+            }
+            if (nation_exists) {
+                const row = await this.getSingleNationBankDV(api, credential, verbose);
+                if (row !== null) {
+                    Ui.log_tabledata(row);
+                }
             }
         }
     }
