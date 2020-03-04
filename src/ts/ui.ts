@@ -67,6 +67,7 @@ export default class Ui {
         $("#pauseButton").on("click", () => this.handlePause());
         $("#cancelButton").on("click", () => this.handleCancel());
         $("#clearButton").on("click", () => Ui.handleClear());
+        $("#clearTableButton").on("click", () => Ui.handleClearTable());
         $(window).on("unload", () => Ui.handleClose());
 
         // Load configuration
@@ -320,10 +321,17 @@ export default class Ui {
     }
 
     /**
-     * Handler fot the clear button.
+     * Handler for the clear button.
      */
     private static handleClear(): void {
         $("#log").html("");
+    }
+
+    /**
+     * Handler for the clear table button.
+     */
+    private static handleClearTable(): void {
+        $("#table_log > tbody").html("");
     }
 
     /**

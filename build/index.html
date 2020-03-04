@@ -172,9 +172,6 @@ MyAwesomePuppet,MySeekritPassword
                         </label>
                     </div>
                     <pre class="log" id="log"></pre>
-                    <table class="table" id="table_log">
-                        <tr><th>Nation</th><th>Bank</th><th>DV</th><th>Issues</th><th>Packs</th></tr>
-                    </table>
                     <button id="pauseButton"
                             class="btn btn-default"
                             disabled>
@@ -188,6 +185,21 @@ MyAwesomePuppet,MySeekritPassword
                     <button id="clearButton" class="btn btn-default">
                         Clear Log
                     </button>
+                    <button id="clearTableButton" class="btn btn-default">
+                        Clear Table
+                    </button>
+                    <table class="table" id="table_log">
+                        <thead>
+                            <tr>
+                                <th id="table-header-nation">Nation</th>
+                                <th id="table-header-bank">Bank</th>
+                                <th id="table-header-dv">DV</th>
+                                <th id="table-header-issues">Issues</th>
+                                <th id="table-header-packs">Packs</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
 
             </div>
