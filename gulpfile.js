@@ -40,13 +40,18 @@ gulp.task("copy-css", function() {
                .pipe(gulp.dest("build/css"))
 });
 
+gulp.task("copy-js", function() {
+    return gulp.src(["src/table-sort.js"])
+               .pipe(gulp.dest("build/js"))
+});
+
 gulp.task("copy-third-party", function() {
     return gulp.src(["src/third-party/**"])
                .pipe(gulp.dest("build/third-party"))
 });
 
 gulp.task("prod", gulp.series("clean", gulp.parallel(["copy-html", "copy-css",
-                   "copy-third-party"], function() {
+                   "copy-third-party", "copy-js"], function() {
     return browserify({
                           debug: false,
                           entries: "src/ts/main.ts",
@@ -67,7 +72,7 @@ gulp.task("prod", gulp.series("clean", gulp.parallel(["copy-html", "copy-css",
 })));
 
 gulp.task("dev", gulp.series("clean", gulp.parallel(["copy-html", "copy-css",
-                  "copy-third-party"], function() {
+                  "copy-third-party", "copy-js"], function() {
     return browserify({
                           debug: true,
                           entries: "src/ts/main.ts",
