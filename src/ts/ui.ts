@@ -387,9 +387,9 @@ export default class Ui {
                     + ` line ${i + 1}`);
             }
             if (tuple.length === 1) {
-                credentials.push({nation: tuple[0], password: null});
+                credentials.push({nation: tuple[0].trim(), password: null});
             } else {
-                credentials.push({nation: tuple[0], password: tuple[1]});
+                credentials.push({nation: tuple[0].trim(), password: tuple[1]});
             }
         }
         if (credentials.length === 0) {
