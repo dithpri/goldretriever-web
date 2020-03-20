@@ -22,8 +22,9 @@ import * as util from "util";
  * Represents the operating mode of goldretriever-web.
  */
 export enum Mode {
-    Bank_DV,
-    Auto
+    Bank_DV = 0,
+    Auto = 1,
+    Issues_Packs = 2
 }
 
 /**
@@ -112,8 +113,11 @@ export default class App {
                 Ui.log("info", "Auto mode");
                 await this.auto(api, credentials, verbose);
             } else if (mode === Mode.Bank_DV) {
-                Ui.log("info", "Bank/DV");
+                Ui.log("info", "Only Bank/DV");
                 await this.getNationsBankDV(api, credentials, verbose);
+            } else if (mode === Mode.Issues_Packs) {
+                Ui.log("info", "Only Issues/Packs");
+                await this.getNationsIssuesPacks(api, credentials, verbose);
             } else {
                 throw new Error("Unrecognized mode");
             }
@@ -227,6 +231,30 @@ export default class App {
                 Ui.log("error", "Bank/DV retrieval failed");
                 if (verbose) {
                     Ui.log("error", util.inspect(err))
+                }
+            }
+        }
+    }
+
+    private async getNationsIssuesPacks(api: NsApi,
+                                  credentials: Credential[],
+                                  verbose: boolean): Promise<void> {
+        for (const credential of credentials) {
+            if (this._cancel) {
+                break;
+            }
+            await this.waitUntilUnpaused();
+            if (credential.password !== null) {
+                try {
+                    const row: LogTableRow | null = await this.getSingleNationIssuesPacks(api, credential);
+                    if (row !== null && row !== undefined) {
+                        Ui.log_tabledata(row);
+                    }
+                } catch(err) {
+                    Ui.log("error", "Issue/Pack retrieval failed.")
+                    if (verbose) {
+                        Ui.log("error", util.inspect(err))
+                    }
                 }
             }
         }

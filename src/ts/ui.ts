@@ -214,6 +214,9 @@ export default class Ui {
                 case "1":
                     $("#modeAuto").prop("checked", true);
                     break;
+                case "2":
+                    $("#modeIssues_Packs").prop("checked", true);
+                    break;
             }
             const credentials = localStorage.getItem("credentials");
             if (credentials !== null) {
@@ -357,10 +360,13 @@ export default class Ui {
     private static getMode(): Mode {
         const bank_DVModeInput = $("#modeBank_DV");
         const autoModeInput = $("#modeAuto");
+        const issues_PacksModeInput = $("#modeIssues_Packs");
         if (bank_DVModeInput.is(":checked")) {
             return Mode.Bank_DV;
         } else if (autoModeInput.is(":checked")) {
             return Mode.Auto;
+        } else if(issues_PacksModeInput.is(":checked"))  {
+            return Mode.Issues_Packs;
         } else {
             throw new Error("No mode is checked");
         }
