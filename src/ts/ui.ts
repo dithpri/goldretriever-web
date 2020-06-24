@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import App, {Credential, Mode, LogTableRow} from "./app";
+import App, { Credential, Mode, LogTableRow } from "./app";
 import * as $ from "jquery";
 
 /**
@@ -83,31 +83,31 @@ export default class Ui {
      * @param message The log message.
      */
     public static log(type: string, message: string) {
-            const logElement = $("#log");
-            const text = logElement.html();
+        const logElement = $("#log");
+        const text = logElement.html();
 
-            message = type + ": " + message;
-            if (text !== "") {
-                message = "<br>" + message;
-            }
-            logElement.html(text + message);
+        message = type + ": " + message;
+        if (text !== "") {
+            message = "<br>" + message;
+        }
+        logElement.html(text + message);
 
-            if ($("#scrollToBottom").is(":checked")) {
-                logElement.scrollTop(
-                    Number(logElement.prop("scrollHeight")));
-            }
+        if ($("#scrollToBottom").is(":checked")) {
+            logElement.scrollTop(
+                Number(logElement.prop("scrollHeight")));
+        }
     }
 
     public static log_tabledata(data: LogTableRow) {
         const logElement = $("#table_log > tbody");
         logElement.append(
             $("<tr></tr>")
-            .append($("<td></td>").text(data.nation))
-            .append($("<td></td>").text(data.bank))
-            .append($("<td></td>").text(data.dv))
-            .append($("<td></td>").text(data.issues))
-            .append($("<td></td>").text(data.packs))
-            );
+                .append($("<td></td>").text(data.nation))
+                .append($("<td></td>").text(data.bank))
+                .append($("<td></td>").text(data.dv))
+                .append($("<td></td>").text(data.issues))
+                .append($("<td></td>").text(data.packs))
+        );
 
         if ($("#scrollToBottom").is(":checked")) {
             logElement.scrollTop(
@@ -154,7 +154,7 @@ export default class Ui {
      * @param containerId The ID of the container of the alert.
      */
     private static showAlert(id: string, message: string, cssClass: string,
-                             containerId: string): void {
+        containerId: string): void {
         if ($("#" + id).length === 0) {
             $("<div>")
                 .attr("id", id)
@@ -172,13 +172,13 @@ export default class Ui {
      * @param formGroupId The ID of the form group of the alert.
      */
     private static showValidationAlert(id: string, message: string,
-                                       formGroupId: string): void {
+        formGroupId: string): void {
         if ($("#" + id).length === 0) {
             $("#" + formGroupId).addClass("has-error");
             Ui.showAlert(id,
-                         message,
-                         "alert-danger additional-top-spacing",
-                         formGroupId);
+                message,
+                "alert-danger additional-top-spacing",
+                formGroupId);
         }
     }
 
@@ -239,15 +239,15 @@ export default class Ui {
     private static handleSave(): void {
         try {
             localStorage.setItem("userAgent",
-                                 String($("#userAgent").val()));
+                String($("#userAgent").val()));
             localStorage.setItem("rateLimit",
-                                 String($("#rateLimit").val()));
+                String($("#rateLimit").val()));
             localStorage.setItem("mode",
-                                 String(Ui.getMode()));
+                String(Ui.getMode()));
             localStorage.setItem("credentials",
-                                 String($("#credentials").val()));
+                String($("#credentials").val()));
             localStorage.setItem("verbose",
-                                 String($("#verbose").is(":checked")));
+                String($("#verbose").is(":checked")));
         } catch {
             // No local storage
         }
@@ -264,23 +264,34 @@ export default class Ui {
         let passValidation = true;
 
         Ui.hideValidationAlert("userAgentValidationAlert",
-                               "userAgentFormGroup");
+            "userAgentFormGroup");
         if (userAgentInput.val() === "") {
             Ui.showValidationAlert("userAgentValidationAlert",
-                                   "You must specify a user agent.",
-                                   "userAgentFormGroup");
+                "You must specify a user agent.",
+                "userAgentFormGroup");
             passValidation = false;
         }
 
         Ui.hideValidationAlert("credentialsValidationAlert",
-                               "credentialsFormGroup");
+            "credentialsFormGroup");
         let credentials: Credential[] = [];
         try {
             credentials = Ui.getCredentials();
         } catch (err) {
             Ui.showValidationAlert("credentialsValidationAlert",
-                                   err.message,
-                                   "credentialsFormGroup");
+                err.message,
+                "credentialsFormGroup");
+            passValidation = false;
+        }
+
+        try {
+            if (!(<HTMLInputElement>rateLimitInput[0]).checkValidity()) {
+                throw new Error("Invalid rate limit")
+            }
+        } catch (err) {
+            Ui.showValidationAlert("rateLimitValidationAlert",
+                err.message,
+                "rateLimitFormGroup");
             passValidation = false;
         }
 
@@ -296,7 +307,7 @@ export default class Ui {
         $("#navbar").find("a[href='#status']").tab("show");
 
         await this._app.start(userAgent, Number(rateLimitInput.val()),
-                              mode, credentials, verbose);
+            mode, credentials, verbose);
     }
 
     /**
@@ -365,7 +376,7 @@ export default class Ui {
             return Mode.Bank_DV;
         } else if (autoModeInput.is(":checked")) {
             return Mode.Auto;
-        } else if(issues_PacksModeInput.is(":checked"))  {
+        } else if (issues_PacksModeInput.is(":checked")) {
             return Mode.Issues_Packs;
         } else {
             throw new Error("No mode is checked");
@@ -393,9 +404,9 @@ export default class Ui {
                     + ` line ${i + 1}`);
             }
             if (tuple.length === 1) {
-                credentials.push({nation: tuple[0].trim(), password: null});
+                credentials.push({ nation: tuple[0].trim(), password: null });
             } else {
-                credentials.push({nation: tuple[0].trim(), password: tuple[1]});
+                credentials.push({ nation: tuple[0].trim(), password: tuple[1] });
             }
         }
         if (credentials.length === 0) {
