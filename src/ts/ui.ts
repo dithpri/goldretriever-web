@@ -100,9 +100,13 @@ export default class Ui {
 
     public static log_tabledata(data: LogTableRow) {
         const logElement = $("#table_log > tbody");
+        const canonicalNationName = data.nation.toLowerCase().replace(" ", "_").replace(/[^a-z0-9_]/g, "");
         logElement.append(
             $("<tr></tr>")
-                .append($("<td></td>").text(data.nation))
+                .append($("<td></td>")
+                    .append($("<a></a>")
+                        .attr("href", `https:/www.nationstates.net/container=${canonicalNationName}/nation=${canonicalNationName}/page=deck`)
+                        .text(data.nation)))
                 .append($("<td></td>").text(data.bank))
                 .append($("<td></td>").text(data.dv))
                 .append($("<td></td>").text(data.issues))
