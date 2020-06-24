@@ -286,7 +286,7 @@ export default class Ui {
 
         try {
             if (!(<HTMLInputElement>rateLimitInput[0]).checkValidity()) {
-                throw new Error("Invalid rate limit")
+                throw new Error("Invalid rate limit. Must be greater than 1200.")
             }
         } catch (err) {
             Ui.showValidationAlert("rateLimitValidationAlert",
@@ -411,7 +411,7 @@ export default class Ui {
         }
         if (credentials.length === 0) {
             throw new Error(
-                "You must specify at least one nation name and"
+                "You must specify at least one nation name and/or"
                 + " password.");
         }
         return credentials;
