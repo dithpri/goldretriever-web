@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {NsApi} from "nsapi";
+import { NsApi, ApiError } from "nsapi";
 import Ui from "./ui";
 import * as util from "util";
 
@@ -32,7 +32,7 @@ export enum Mode {
  */
 export interface Credential {
     nation: string,
-    password: string|null
+    password: string | null
 }
 
 export interface LogTableRow {
@@ -98,13 +98,12 @@ export default class App {
      * @param verbose Whether or not to print out detailed error messages.
      */
     public async start(userAgent: string, rateLimit: number, mode: Mode,
-                       credentials: Credential[],
-                       verbose: boolean): Promise<void>
-    {
+        credentials: Credential[],
+        verbose: boolean): Promise<void> {
         this.reset();
 
         this._userAgent = `goldretriever-web (maintained by dithpri/Racoda, currently`
-                          + ` used by "${userAgent}")`;
+            + ` used by "${userAgent}")`;
 
         const api = new NsApi(userAgent, true, rateLimit);
 
@@ -185,18 +184,19 @@ export default class App {
      * @param verbose Whether or not to print out detailed error messages.
      */
     private async auto(api: NsApi, credentials: Credential[],
-                       verbose: boolean): Promise<void> {
+        verbose: boolean): Promise<void> {
         for (const credential of credentials) {
             if (this._cancel) {
                 break;
             }
             await this.waitUntilUnpaused();
+            var result: LogTableRow = { nation: credential.nation, bank: "N/A", dv: "N/A", issues: "N/A", packs: "N/A" };
             try {
                 // function scope
-                var result: LogTableRow = <LogTableRow> await this.getSingleNationBankDV(api, credential);
-            } catch(err) {
+                result = <LogTableRow>await this.getSingleNationBankDV(api, credential);
+            } catch (err) {
                 Ui.log("error", "Bank/DV retrieval failed");
-                continue;
+                this.handleError(err, verbose);
             }
             if (credential.password !== null) {
                 try {
@@ -205,11 +205,9 @@ export default class App {
                         result.issues = result2.issues;
                         result.packs = result2.packs;
                     }
-                } catch(err) {
+                } catch (err) {
                     Ui.log("error", "Issue/Pack retrieval failed.")
-                    if (verbose) {
-                        Ui.log("error", util.inspect(err))
-                    }
+                    this.handleError(err, verbose);
                 }
             }
             Ui.log_tabledata(result);
@@ -217,8 +215,8 @@ export default class App {
     }
 
     private async getNationsBankDV(api: NsApi,
-                                  credentials: Credential[],
-                                  verbose: boolean): Promise<void> {
+        credentials: Credential[],
+        verbose: boolean): Promise<void> {
         for (const credential of credentials) {
             if (this._cancel) {
                 break;
@@ -227,18 +225,16 @@ export default class App {
             try {
                 const row: LogTableRow = await this.getSingleNationBankDV(api, credential);
                 Ui.log_tabledata(row);
-            } catch(err) {
+            } catch (err) {
                 Ui.log("error", "Bank/DV retrieval failed");
-                if (verbose) {
-                    Ui.log("error", util.inspect(err))
-                }
+                this.handleError(err, verbose);
             }
         }
     }
 
     private async getNationsIssuesPacks(api: NsApi,
-                                  credentials: Credential[],
-                                  verbose: boolean): Promise<void> {
+        credentials: Credential[],
+        verbose: boolean): Promise<void> {
         for (const credential of credentials) {
             if (this._cancel) {
                 break;
@@ -250,18 +246,16 @@ export default class App {
                     if (row !== null && row !== undefined) {
                         Ui.log_tabledata(row);
                     }
-                } catch(err) {
+                } catch (err) {
                     Ui.log("error", "Issue/Pack retrieval failed.")
-                    if (verbose) {
-                        Ui.log("error", util.inspect(err))
-                    }
+                    this.handleError(err, verbose);
                 }
             }
         }
     }
 
     private async getSingleNationIssuesPacks(api: NsApi,
-                                        credential: Credential): Promise<LogTableRow> {
+        credential: Credential): Promise<LogTableRow> {
         if (credential.password === null) {
             throw new Error("Tried to retrieve Issues/Packs without a password.");
         }
@@ -269,7 +263,7 @@ export default class App {
         const response = await api.nationRequest(credential.nation,
             ["packs", "issues"],
             undefined,
-            {password: <string>credential.password},
+            { password: <string>credential.password },
             true);
         const packs: string = response.packs;
         let issues: string = "0";
@@ -291,10 +285,10 @@ export default class App {
 
 
     private async getSingleNationBankDV(api: NsApi,
-                                  credential: Credential): Promise<LogTableRow> {
+        credential: Credential): Promise<LogTableRow> {
         Ui.log("info", `${credential.nation}: Retrieving Bank and DV`);
         // A hack, cards api is not available in node-nsapi
-        const response = await api.worldRequest(["cards", "info"], {"nationname":credential.nation});
+        const response = await api.worldRequest(["cards", "info"], { "nationname": credential.nation });
         if (response.info === "") {
             throw new Error("Received empty response. Does the nation exist?");
         }
@@ -317,4 +311,23 @@ export default class App {
             await App.sleep(1000);
         }
     }
+
+    /**
+     * Logs error if verbose mode is enabled, cancels data retrieveal if API
+     * returns 429 (Too many requests).
+     */
+
+    private handleError(err: any, verbose: boolean): void {
+        if (verbose) {
+            Ui.log("error", util.inspect(err))
+        }
+        try {
+            const metadata = (<ApiError>err).responseMetadata;
+            if (metadata && metadata.statusCode == 429) {
+                Ui.log("error", "Too many requests!");
+                this.cancel();
+            }
+        } catch (_) { };
+    }
+
 }
