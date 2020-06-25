@@ -105,7 +105,7 @@ export default class Ui {
             $("<tr></tr>")
                 .append($("<td></td>")
                     .append($("<a></a>")
-                        .attr("href", `https:/www.nationstates.net/container=${canonicalNationName}/nation=${canonicalNationName}/page=deck`)
+                        .attr("href", `https://www.nationstates.net/container=${canonicalNationName}/nation=${canonicalNationName}/page=deck`)
                         .text(data.nation)))
                 .append($("<td></td>").text(data.bank))
                 .append($("<td></td>").text(data.dv))
