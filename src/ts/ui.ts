@@ -100,7 +100,7 @@ export default class Ui {
 
     public static log_tabledata(data: LogTableRow) {
         const logElement = $("#table_log > tbody");
-        const canonicalNationName = data.nation.toLowerCase().replace(" ", "_").replace(/[^a-z0-9_]/g, "");
+        const canonicalNationName = data.nation.toLowerCase().replace(/ /g, "_").replace(/[^a-z0-9_]/g, "");
         logElement.append(
             $("<tr></tr>")
                 .append($("<td></td>")
