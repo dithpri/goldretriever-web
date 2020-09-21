@@ -40,7 +40,9 @@ export interface LogTableRow {
     bank?: string,
     dv?: string,
     issues?: string,
-    packs?: string
+    packs?: string,
+    deck_capacity?: string,
+    number_of_cards?: string,
 }
 
 /**
@@ -294,7 +296,9 @@ export default class App {
         return {
             nation: credential.nation,
             bank: String(response.info.bank),
-            dv: String(response.info.deck_value)
+            dv: String(response.info.deck_value),
+            deck_capacity: String(response.info.deck_capacity_raw),
+            number_of_cards: String(response.info.num_cards)
         };
     }
 

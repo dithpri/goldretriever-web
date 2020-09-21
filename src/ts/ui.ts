@@ -111,6 +111,8 @@ export default class Ui {
                 .append($("<td></td>").text(data.dv || "N/A"))
                 .append($("<td></td>").text(data.issues || "N/A"))
                 .append($("<td></td>").text(data.packs || "N/A"))
+                .append($("<td></td>").text(data.number_of_cards || "N/A"))
+                .append($("<td></td>").text(data.deck_capacity || "N/A"))
         );
 
         if ($("#scrollToBottom").is(":checked")) {
