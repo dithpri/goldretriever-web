@@ -37,10 +37,10 @@ export interface Credential {
 
 export interface LogTableRow {
     nation: string,
-    bank: string,
-    dv: string,
-    issues: string,
-    packs: string
+    bank?: string,
+    dv?: string,
+    issues?: string,
+    packs?: string
 }
 
 /**
@@ -190,7 +190,7 @@ export default class App {
                 break;
             }
             await this.waitUntilUnpaused();
-            var result: LogTableRow = { nation: credential.nation, bank: "N/A", dv: "N/A", issues: "N/A", packs: "N/A" };
+            var result: LogTableRow = { nation: credential.nation };
             try {
                 // function scope
                 result = <LogTableRow>await this.getSingleNationBankDV(api, credential);
@@ -261,25 +261,24 @@ export default class App {
         }
         Ui.log("info", `${credential.nation}: Retrieving Issues and Packs`);
         const response = await api.nationRequest(credential.nation,
-            ["packs", "issues"],
+            ["packs", "issuesummary"],
             undefined,
             { password: <string>credential.password },
             true);
         const packs: string = response.packs;
+        Ui.log("info", `${credential.nation}: Packs: ${packs}`);
         let issues: string = "0";
-        if (Array.isArray(response.issues.issue)) {
-            issues = response.issues.issue.length;
-        } else if (response.issues.issue) {
+        if (Array.isArray(response.issuesummary.issue)) {
+            issues = response.issuesummary.issue.length;
+        } else if (response.issuesummary.issue) {
             issues = "1";
         } else {
             issues = "0";
         }
         return {
             nation: credential.nation,
-            bank: "N/A",
-            dv: "N/A",
-            issues: issues,
-            packs: packs
+            issues: String(issues),
+            packs: String(packs)
         };
     }
 
@@ -294,10 +293,8 @@ export default class App {
         }
         return {
             nation: credential.nation,
-            bank: response.info.bank,
-            dv: response.info.deck_value,
-            issues: "N/A",
-            packs: "N/A"
+            bank: String(response.info.bank),
+            dv: String(response.info.deck_value)
         };
     }
 

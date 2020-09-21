@@ -107,10 +107,10 @@ export default class Ui {
                     .append($("<a></a>")
                         .attr("href", `https://www.nationstates.net/container=${canonicalNationName}/nation=${canonicalNationName}/page=deck`)
                         .text(data.nation)))
-                .append($("<td></td>").text(data.bank))
-                .append($("<td></td>").text(data.dv))
-                .append($("<td></td>").text(data.issues))
-                .append($("<td></td>").text(data.packs))
+                .append($("<td></td>").text(data.bank || "N/A"))
+                .append($("<td></td>").text(data.dv || "N/A"))
+                .append($("<td></td>").text(data.issues || "N/A"))
+                .append($("<td></td>").text(data.packs || "N/A"))
         );
 
         if ($("#scrollToBottom").is(":checked")) {
