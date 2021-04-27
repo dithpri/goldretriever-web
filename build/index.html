@@ -90,9 +90,13 @@
                         <label class="control-label" for="rateLimit">Rate
                             limit</label>
                         <span class="help-block">The number of milliseconds
-                            between NationStates API requests.</span>
+                            between NationStates API requests. Only go below
+                            1200 if you know what you're doing.</span>
+                            <!--1200 is the minimum delay iff CORS requests
+                                 are sent, as we have no way of detecting them,
+                                 but NS counts them towards the limit.-->
                         <input type="number" class="form-control" id="rateLimit"
-                               min="1200" value="1500">
+                               min="600" value="1200">
                     </div>
                     <div class="form-group" id="modeFormGroup">
                         <label class="control-label">Operating mode</label>
