@@ -58,7 +58,9 @@ export default class App {
      * Initializes a new instance of the App class.
      */
     constructor() {
-        this.reset();
+        this._cancel = false;
+        this._pause = false;
+        // this.reset();
     }
 
     /**
@@ -107,7 +109,7 @@ export default class App {
         this._userAgent = `goldretriever-web (maintained by dithpri/Racoda, currently`
             + ` used by "${userAgent}")`;
 
-        const api = new NsApi(userAgent, true, rateLimit);
+        const api = new NsApi(userAgent, {apiDelayMillis: rateLimit});
 
         try {
             if (mode === Mode.Auto) {
@@ -320,7 +322,9 @@ export default class App {
 
     private handleError(err: any, verbose: boolean): void {
         if (verbose) {
-            Ui.log("error", util.inspect(err))
+            Ui.log("error", util.inspect(err));
+            console.log(util.inspect(err));
+            console.log(err);
         }
         try {
             const metadata = (<ApiError>err).responseMetadata;

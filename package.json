@@ -10,24 +10,31 @@
     "type": "git",
     "url": "git://github.com/dithpri/goldretriever-web.git"
   },
+  "resolutions": {
+    "stream-http": "2.8.2"
+  },
+  "scripts": {
+    "preinstall": "npx npm-force-resolutions"
+  },
   "devDependencies": {
-    "browserify": "^14.5.0",
-    "del": "^3.0.0",
+    "browserify": "~16.3.0",
+    "del": "^6.0.0",
     "gulp": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.5",
+    "gulp-sourcemaps": "^3.0.0",
     "gulp-uglify": "^3.0.2",
-    "tsify": "^3.0.4",
-    "typescript": "^2.6.2",
-    "uglify-js": "^3.2.2",
+    "npm-force-resolutions": "^0.0.10",
+    "tsify": "^5.0.2",
+    "typescript": "^4.2.4",
+    "uglify-js": "^3.13.4",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
   },
   "dependencies": {
-    "@types/bootstrap": "^4.3.1",
-    "@types/jquery": "^3.3.33",
-    "bootstrap": "^4.4.1",
-    "es6-promise": "^4.2.2",
-    "jquery": "^3.5.0",
-    "nsapi": "^0.1.14"
+    "@types/bootstrap": "^5.0.12",
+    "@types/jquery": "^3.5.5",
+    "bootstrap": "^4.6.0",
+    "es6-promise": "^4.2.8",
+    "jquery": "^3.6.0",
+    "nsapi": "^0.2.0"
   }
 }

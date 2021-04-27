@@ -125,7 +125,7 @@ export default class Ui {
     /**
      * Enables the confirm button and waits for a response.
      */
-    public static confirm(): Promise<string> {
+    public static confirm(): Promise<void> {
         return new Promise((resolve) => {
             const confirmButton = $("#confirmButton");
             confirmButton.prop("disabled", false);
