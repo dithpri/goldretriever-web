@@ -285,7 +285,7 @@ export default class Ui {
         let credentials: Credential[] = [];
         try {
             credentials = Ui.getCredentials();
-        } catch (err) {
+        } catch (err: any) {
             Ui.showValidationAlert("credentialsValidationAlert",
                 err.message,
                 "credentialsFormGroup");
@@ -296,7 +296,7 @@ export default class Ui {
             if (!(<HTMLInputElement>rateLimitInput[0]).checkValidity()) {
                 throw new Error("Invalid rate limit. Must be greater than 1200.")
             }
-        } catch (err) {
+        } catch (err: any) {
             Ui.showValidationAlert("rateLimitValidationAlert",
                 err.message,
                 "rateLimitFormGroup");
