@@ -110,6 +110,7 @@ export default class Ui {
                         .text(data.nation)))
                 .append($("<td></td>").text(data.bank || "N/A"))
                 .append($("<td></td>").text(data.dv || "N/A"))
+                .append($("<td></td>").text(data.jv || "N/A"))
                 .append($("<td></td>").text(data.issues || "N/A"))
                 .append($("<td></td>").text(data.packs || "N/A"))
                 .append($("<td></td>").text(data.number_of_cards || "N/A"))
@@ -216,7 +217,7 @@ export default class Ui {
             const mode = localStorage.getItem("mode");
             switch (mode) {
                 case "0":
-                    $("#modeBank_Dv").prop("checked", true);
+                    $("#modeDeck_Info").prop("checked", true);
                     break;
                 case "1":
                     $("#modeAuto").prop("checked", true);
@@ -376,11 +377,11 @@ export default class Ui {
      * Gets the selected mode.
      */
     private static getMode(): Mode {
-        const bank_DVModeInput = $("#modeBank_DV");
+        const Deck_InfoModeInput = $("#modeDeck_Info");
         const autoModeInput = $("#modeAuto");
         const issues_PacksModeInput = $("#modeIssues_Packs");
-        if (bank_DVModeInput.is(":checked")) {
-            return Mode.Bank_DV;
+        if (Deck_InfoModeInput.is(":checked")) {
+            return Mode.Deck_Info;
         } else if (autoModeInput.is(":checked")) {
             return Mode.Auto;
         } else if (issues_PacksModeInput.is(":checked")) {

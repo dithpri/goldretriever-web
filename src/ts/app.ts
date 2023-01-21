@@ -22,7 +22,7 @@ import * as util from "util";
  * Represents the operating mode of goldretriever-web.
  */
 export enum Mode {
-    Bank_DV = 0,
+    Deck_Info = 0,
     Auto = 1,
     Issues_Packs = 2
 }
@@ -39,6 +39,7 @@ export interface LogTableRow {
     nation: string,
     bank?: string,
     dv?: string,
+    jv?: string,
     issues?: string,
     packs?: string,
     deck_capacity?: string,
@@ -115,9 +116,9 @@ export default class App {
             if (mode === Mode.Auto) {
                 Ui.log("info", "Auto mode");
                 await this.auto(api, credentials, verbose);
-            } else if (mode === Mode.Bank_DV) {
+            } else if (mode === Mode.Deck_Info) {
                 Ui.log("info", "Only Bank/DV");
-                await this.getNationsBankDV(api, credentials, verbose);
+                await this.getNationsDeckInfo(api, credentials, verbose);
             } else if (mode === Mode.Issues_Packs) {
                 Ui.log("info", "Only Issues/Packs");
                 await this.getNationsIssuesPacks(api, credentials, verbose);
@@ -197,7 +198,7 @@ export default class App {
             var result: LogTableRow = { nation: credential.nation };
             try {
                 // function scope
-                result = <LogTableRow>await this.getSingleNationBankDV(api, credential);
+                result = <LogTableRow>await this.getSingleNationDeckInfo(api, credential);
             } catch (err) {
                 Ui.log("error", "Bank/DV retrieval failed");
                 this.handleError(err, verbose);
@@ -218,7 +219,7 @@ export default class App {
         }
     }
 
-    private async getNationsBankDV(api: NsApi,
+    private async getNationsDeckInfo(api: NsApi,
         credentials: Credential[],
         verbose: boolean): Promise<void> {
         for (const credential of credentials) {
@@ -227,7 +228,7 @@ export default class App {
             }
             await this.waitUntilUnpaused();
             try {
-                const row: LogTableRow = await this.getSingleNationBankDV(api, credential);
+                const row: LogTableRow = await this.getSingleNationDeckInfo(api, credential);
                 Ui.log_tabledata(row);
             } catch (err) {
                 Ui.log("error", "Bank/DV retrieval failed");
@@ -286,19 +287,47 @@ export default class App {
         };
     }
 
+    /**
+     * 
+     * @param rarity a lowercase string representing the card rarity
+     * @return returns the rarity's JV in *pennies*
+     */
+    private rarityToJv(rarity: string): number {
+        if (rarity == "legendary") {
+            return 100;
+        } else if (rarity == "epic") {
+            return 50;
+        } else if (rarity == "ultra-rare") {
+            return 20;
+        } else if (rarity == "rare") {
+            return 10;
+        } else if (rarity == "uncommon") {
+            return 5;
+        } else if (rarity == "common") {
+            return 1;
+        }
+        return NaN;
+    }
 
-    private async getSingleNationBankDV(api: NsApi,
+    private async getSingleNationDeckInfo(api: NsApi,
         credential: Credential): Promise<LogTableRow> {
         Ui.log("info", `${credential.nation}: Retrieving Bank and DV`);
         // A hack, cards api is not available in node-nsapi
-        const response = await api.worldRequest(["cards", "info"], { "nationname": credential.nation });
+        const response = await api.worldRequest(["cards", "info", "deck"], { "nationname": credential.nation });
         if (response.info === "") {
             throw new Error("Received empty response. Does the nation exist?");
+        }
+        console.log(response.deck);
+        console.log(this.rarityToJv("foo"));
+        let cards = response.deck.card;
+        if (!Array.isArray(cards)) {
+            cards = [cards];
         }
         return {
             nation: credential.nation,
             bank: String(response.info.bank),
             dv: String(response.info.deck_value),
+            jv: String(cards.reduce((acc: number, cur: { category: string; }) => acc + this.rarityToJv(cur.category), 0) / 100),
             deck_capacity: String(response.info.deck_capacity_raw),
             number_of_cards: String(response.info.num_cards)
         };
