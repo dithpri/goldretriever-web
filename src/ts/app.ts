@@ -319,8 +319,10 @@ export default class App {
         }
         console.log(response.deck);
         console.log(this.rarityToJv("foo"));
-        let cards = response.deck.card;
-        if (!Array.isArray(cards)) {
+        let cards = response.deck?.card;
+        if (cards == undefined) {
+            cards = [];
+        } else if (!Array.isArray(cards)) {
             cards = [cards];
         }
         return {
